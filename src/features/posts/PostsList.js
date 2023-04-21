@@ -1,24 +1,38 @@
-import { useSelector } from "react-redux"
-import { selectAllPosts } from "./postSlice"
+import { useSelector,useDispatch } from "react-redux"
+import { selectAllPosts,getAllPosts,getPostStatus,getPostError} from "./postSlice"
 import PostItem from "./PostItem"
+import { useEffect } from "react"
 
 const PostsList = ()=>{
+    const dispatch = useDispatch()
+
+    const status = useSelector(getPostStatus)
+    const error = useSelector(getPostError)
     const posts = useSelector(selectAllPosts)
 
-    const orderedPostByDate = posts.slice().sort((a,b) => b.date.localeCompare(a.date))
+    useEffect(()=>{
+        if(status === 'idle'){
+            dispatch(getAllPosts())
+        }
+    },[status,dispatch])
 
-    const renderedPosts = orderedPostByDate.map((post) => {
-        return (
-            <PostItem post={post} />
-        )
-    })
+    let content;
 
-    return (
-        <section>
-            <h2>All Posts</h2>
-            {renderedPosts}
-        </section>
-    )
+    if(status === 'loading'){
+        content = (<p>Loading.....</p>)
+    }else if(status === 'success'){
+        const orderedPostByDate = posts.slice().sort((a,b) => b.date.localeCompare(a.date))
+
+        content = orderedPostByDate.map((post) => {
+            return (
+                <PostItem post={post} />
+            )
+        })
+    }else if(status === 'fail'){
+        content = (<p>{error}</p>)
+        console.log(error)
+    }
+    return content
 }
 
 export default PostsList

@@ -1,12 +1,13 @@
 import { useState } from "react";
 import { useDispatch,useSelector } from "react-redux";
-import { addPost } from "./postSlice";
+import { addNewPost } from "./postSlice";
 import { selectAllUsers } from "../users/userSlice";
 
 const AddNewPost = () => {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [author, setAuthor] = useState('');
+  const [addRequestStatus,setAddRequestStatus] = useState('idle')
 
   const users = useSelector(selectAllUsers)
 
@@ -30,21 +31,29 @@ const AddNewPost = () => {
 
   const dispatch = useDispatch()
 
-  const canCreate = title && content && author
+  const canCreate = [title,content,author].every(Boolean) && addRequestStatus === 'idle'
 
   const onPostCreate = (event)=>{
     event.preventDefault()
 
     if(canCreate){
-        dispatch(addPost(
-            title,
-            content,
-            author,
-        ))
+       try {
 
-        setTitle('')
+        dispatch(addNewPost({
+          title,
+          body:content,
+          userId:author,
+        }
+      ))
+      setTitle('')
         setContent('')
         setAuthor('')
+        
+       } catch (error) {
+        console.error('failed to save the post',error)
+       }finally{
+        setAddRequestStatus('idle')
+       }
     }
 
     

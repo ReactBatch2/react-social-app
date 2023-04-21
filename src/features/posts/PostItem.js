@@ -6,7 +6,7 @@ const PostItem = ({ post }) => {
   return (
     <article key={post.id}>
       <h3>{post.title}</h3>
-      <p>{post.content.substring(0, 150)}</p>
+      <p>{post.body.substring(0, 150)}</p>
       <PostAuthor post={post} />
       <TimeAgo date={post.date} />
       <ReactionButtons post={post} />
